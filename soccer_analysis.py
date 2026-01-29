@@ -22,6 +22,22 @@ pd.set_option('display.width', None)
 class SoccerAnalysis:
     """Comprehensive soccer player rating and voter analysis system"""
     
+    # Reliability scoring thresholds and penalties
+    HIGH_VARIANCE_THRESHOLD = 2.5  # Standard deviation indicating inconsistent scoring
+    LOW_VARIANCE_THRESHOLD = 1.0   # Standard deviation indicating lack of differentiation
+    GENEROUS_DEVIATION = 1.5       # Mean deviation indicating too generous scoring
+    HARSH_DEVIATION = -1.5         # Mean deviation indicating too harsh scoring
+    SELF_BIAS_THRESHOLD = 1.0      # Difference threshold for self-bias detection
+    SKILL_INCONSISTENCY_THRESHOLD = 3.0  # Std deviation for similar skills inconsistency
+    
+    # Reliability score penalties
+    PENALTY_HIGH_VARIANCE = 20
+    PENALTY_LOW_VARIANCE = 10
+    PENALTY_GENEROUS = 25
+    PENALTY_HARSH = 25
+    PENALTY_MISSING_DATA = 15
+    PENALTY_SELF_BIAS = 30
+    
     def __init__(self, csv_file):
         """Initialize with CSV file"""
         self.csv_file = csv_file
@@ -252,8 +268,8 @@ class SoccerAnalysis:
                 }
                 
                 # Variance analysis
-                analysis['bias_indicators']['high_variance'] = analysis['statistics']['std'] > 2.5
-                analysis['bias_indicators']['low_variance'] = analysis['statistics']['std'] < 1.0
+                analysis['bias_indicators']['high_variance'] = analysis['statistics']['std'] > self.HIGH_VARIANCE_THRESHOLD
+                analysis['bias_indicators']['low_variance'] = analysis['statistics']['std'] < self.LOW_VARIANCE_THRESHOLD
                 
                 # Mean deviation from overall mean
                 all_voters_scores = []
@@ -269,8 +285,8 @@ class SoccerAnalysis:
                 overall_mean = np.mean(all_voters_scores)
                 deviation = analysis['statistics']['mean'] - overall_mean
                 analysis['bias_indicators']['mean_deviation'] = deviation
-                analysis['bias_indicators']['too_generous'] = deviation > 1.5
-                analysis['bias_indicators']['too_harsh'] = deviation < -1.5
+                analysis['bias_indicators']['too_generous'] = deviation > self.GENEROUS_DEVIATION
+                analysis['bias_indicators']['too_harsh'] = deviation < self.HARSH_DEVIATION
                 
                 # Analyze self-rating (if applicable)
                 self._analyze_self_rating(voter_num, analysis)
@@ -281,17 +297,17 @@ class SoccerAnalysis:
                 # Calculate reliability score (0-100)
                 reliability = 100
                 if analysis['bias_indicators']['high_variance']:
-                    reliability -= 20
+                    reliability -= self.PENALTY_HIGH_VARIANCE
                 if analysis['bias_indicators']['low_variance']:
-                    reliability -= 10
+                    reliability -= self.PENALTY_LOW_VARIANCE
                 if analysis['bias_indicators']['too_generous']:
-                    reliability -= 25
+                    reliability -= self.PENALTY_GENEROUS
                 if analysis['bias_indicators']['too_harsh']:
-                    reliability -= 25
+                    reliability -= self.PENALTY_HARSH
                 if analysis['statistics']['missing_count'] > 10:
-                    reliability -= 15
+                    reliability -= self.PENALTY_MISSING_DATA
                 if 'self_bias' in analysis['bias_indicators'] and analysis['bias_indicators']['self_bias']:
-                    reliability -= 30
+                    reliability -= self.PENALTY_SELF_BIAS
                 
                 analysis['reliability_score'] = max(0, reliability)
             
@@ -341,7 +357,7 @@ class SoccerAnalysis:
                     analysis['bias_indicators']['self_rating_avg'] = self_avg
                     analysis['bias_indicators']['others_rating_avg'] = others_avg
                     analysis['bias_indicators']['self_vs_others_diff'] = diff
-                    analysis['bias_indicators']['self_bias'] = diff > 1.0
+                    analysis['bias_indicators']['self_bias'] = diff > self.SELF_BIAS_THRESHOLD
                     analysis['bias_indicators']['player_name'] = player_name
     
     def _analyze_consistency(self, voter, analysis):
@@ -366,7 +382,7 @@ class SoccerAnalysis:
             
             if len(tech_scores) >= 2:
                 std = np.std(tech_scores)
-                if std > 3.0:  # High variation in similar skills
+                if std > self.SKILL_INCONSISTENCY_THRESHOLD:  # High variation in similar skills
                     inconsistencies.append({
                         'player': player,
                         'category': 'Technical',

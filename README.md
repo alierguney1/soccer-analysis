@@ -8,7 +8,7 @@ Detaylı futbol oyuncu analiz sistemi - 6 eksenli oyuncu değerlendirme ve oylay
 
 1. **Teknik Top Kontrolü** (Technical Ball Control)
    - Topu kontrol etme
-   - Dripling
+   - Dribling
    - Pas verme
 
 2. **Şut ve Bitiricilik** (Shooting & Finishing)

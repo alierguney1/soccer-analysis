@@ -27,7 +27,6 @@ class SoccerAnalysis:
     LOW_VARIANCE_THRESHOLD = 1.0   # Standard deviation indicating lack of differentiation
     GENEROUS_DEVIATION = 1.5       # Mean deviation indicating too generous scoring
     HARSH_DEVIATION = -1.5         # Mean deviation indicating too harsh scoring
-    SELF_BIAS_THRESHOLD = 1.0      # Difference threshold for self-bias detection
     SKILL_INCONSISTENCY_THRESHOLD = 3.0  # Std deviation for similar skills inconsistency
     
     # Reliability score penalties
@@ -36,7 +35,9 @@ class SoccerAnalysis:
     PENALTY_GENEROUS = 25
     PENALTY_HARSH = 25
     PENALTY_MISSING_DATA = 15
-    PENALTY_SELF_BIAS = 30
+    
+    # Filtering thresholds
+    RELIABILITY_FILTER_THRESHOLD = 75  # Voters below this reliability are excluded
     
     def __init__(self, csv_file):
         """Initialize with CSV file"""
@@ -121,6 +122,8 @@ class SoccerAnalysis:
         self.player_ratings = {}
         
         for player in self.players:
+            if self.df is None:
+                continue
             player_data = self.df[self.df['Name'] == player]
             
             ratings = {
@@ -246,6 +249,8 @@ class SoccerAnalysis:
             
             # Collect all scores from this voter
             all_scores = []
+            if self.df is None:
+                continue
             for _, row in self.df.iterrows():
                 try:
                     score = row[voter]
@@ -264,7 +269,7 @@ class SoccerAnalysis:
                     'max': max(all_scores),
                     'range': max(all_scores) - min(all_scores),
                     'count': len(all_scores),
-                    'missing_count': len(self.df) - len(all_scores)
+                    'missing_count': (len(self.df) if self.df is not None else 0) - len(all_scores)
                 }
                 
                 # Variance analysis
@@ -273,23 +278,24 @@ class SoccerAnalysis:
                 
                 # Mean deviation from overall mean
                 all_voters_scores = []
-                for v in self.voters:
-                    for _, row in self.df.iterrows():
-                        try:
-                            score = row[v]
-                            if pd.notna(score) and str(score).strip():
-                                all_voters_scores.append(float(score))
-                        except:
-                            continue
+                if self.df is not None:
+                    for v in self.voters:
+                        for _, row in self.df.iterrows():
+                            try:
+                                score = row[v]
+                                if pd.notna(score) and str(score).strip():
+                                    all_voters_scores.append(float(score))
+                            except:
+                                continue
                 
-                overall_mean = np.mean(all_voters_scores)
-                deviation = analysis['statistics']['mean'] - overall_mean
-                analysis['bias_indicators']['mean_deviation'] = deviation
-                analysis['bias_indicators']['too_generous'] = deviation > self.GENEROUS_DEVIATION
-                analysis['bias_indicators']['too_harsh'] = deviation < self.HARSH_DEVIATION
+                    overall_mean = np.mean(all_voters_scores)
+                    deviation = analysis['statistics']['mean'] - overall_mean
+                    analysis['bias_indicators']['mean_deviation'] = deviation
+                    analysis['bias_indicators']['too_generous'] = deviation > self.GENEROUS_DEVIATION
+                    analysis['bias_indicators']['too_harsh'] = deviation < self.HARSH_DEVIATION
                 
-                # Analyze self-rating (if applicable)
-                self._analyze_self_rating(voter_num, analysis)
+                # NOTE: Self-rating analysis removed because voter order is random
+                # and we don't have voter-to-player mapping data
                 
                 # Analyze consistency
                 self._analyze_consistency(voter, analysis)
@@ -306,8 +312,6 @@ class SoccerAnalysis:
                     reliability -= self.PENALTY_HARSH
                 if analysis['statistics']['missing_count'] > 10:
                     reliability -= self.PENALTY_MISSING_DATA
-                if 'self_bias' in analysis['bias_indicators'] and analysis['bias_indicators']['self_bias']:
-                    reliability -= self.PENALTY_SELF_BIAS
                 
                 analysis['reliability_score'] = max(0, reliability)
             
@@ -316,54 +320,17 @@ class SoccerAnalysis:
         # Display voter analysis
         self._display_voter_analysis()
         
-    def _analyze_self_rating(self, voter_num, analysis):
-        """Analyze if voter gave themselves higher scores"""
-        # Try to match voter number with player
-        # Assuming voters are numbered 1-15 and correspond to players in order
-        if voter_num <= len(self.players):
-            player_name = self.players[voter_num - 1]
-            voter = analysis['voter_id']
-            
-            # Get this voter's scores for themselves
-            self_scores = []
-            player_data = self.df[self.df['Name'] == player_name]
-            for _, row in player_data.iterrows():
-                try:
-                    score = row[voter]
-                    if pd.notna(score) and str(score).strip():
-                        self_scores.append(float(score))
-                except:
-                    continue
-            
-            if self_scores:
-                # Get average scores this voter gives to others
-                other_scores = []
-                for other_player in self.players:
-                    if other_player != player_name:
-                        other_data = self.df[self.df['Name'] == other_player]
-                        for _, row in other_data.iterrows():
-                            try:
-                                score = row[voter]
-                                if pd.notna(score) and str(score).strip():
-                                    other_scores.append(float(score))
-                            except:
-                                continue
-                
-                if other_scores:
-                    self_avg = np.mean(self_scores)
-                    others_avg = np.mean(other_scores)
-                    diff = self_avg - others_avg
-                    
-                    analysis['bias_indicators']['self_rating_avg'] = self_avg
-                    analysis['bias_indicators']['others_rating_avg'] = others_avg
-                    analysis['bias_indicators']['self_vs_others_diff'] = diff
-                    analysis['bias_indicators']['self_bias'] = diff > self.SELF_BIAS_THRESHOLD
-                    analysis['bias_indicators']['player_name'] = player_name
+    # NOTE: _analyze_self_rating method removed because voter order is random
+    # and we don't have reliable voter-to-player mapping data
+    # Self-bias cannot be detected without knowing which voter is which player
     
     def _analyze_consistency(self, voter, analysis):
         """Analyze voter consistency across similar skills"""
         # Check if voter gives similar scores for similar skill categories
         inconsistencies = []
+        
+        if self.df is None:
+            return
         
         for player in self.players:
             player_data = self.df[self.df['Name'] == player]
@@ -439,13 +406,6 @@ class SoccerAnalysis:
                 flags.append(f"⚠️  HIGH VARIANCE (std {data['statistics']['std']:.2f})")
             if data['bias_indicators'].get('low_variance'):
                 flags.append(f"⚠️  LOW VARIANCE (std {data['statistics']['std']:.2f}) - possibly not differentiating")
-            if data['bias_indicators'].get('self_bias'):
-                player = data['bias_indicators'].get('player_name', 'Unknown')
-                self_avg = data['bias_indicators'].get('self_rating_avg', 0)
-                others_avg = data['bias_indicators'].get('others_rating_avg', 0)
-                diff = data['bias_indicators'].get('self_vs_others_diff', 0)
-                flags.append(f"🚨 SELF-BIAS DETECTED for {player}")
-                flags.append(f"   Self: {self_avg:.2f}, Others: {others_avg:.2f}, Diff: +{diff:.2f}")
             if data['bias_indicators'].get('has_inconsistencies'):
                 flags.append(f"⚠️  INCONSISTENT RATINGS")
             
@@ -463,8 +423,6 @@ class SoccerAnalysis:
         problematic = []
         for voter, data in self.voter_analysis.items():
             issues = []
-            if data['bias_indicators'].get('self_bias'):
-                issues.append('Self-bias')
             if data['bias_indicators'].get('too_generous'):
                 issues.append('Too generous')
             if data['bias_indicators'].get('too_harsh'):
@@ -494,6 +452,9 @@ class SoccerAnalysis:
         print("Shows which players are rated most inconsistently by different voters")
         
         perception_data = []
+        
+        if self.df is None:
+            return
         
         for player in self.players:
             overall_scores = []
@@ -530,6 +491,237 @@ class SoccerAnalysis:
         
         print("\nPlayers with MOST CONSISTENT ratings (high agreement):")
         print(perception_df.tail(5).to_string(index=False))
+    
+    
+    def advanced_voter_bias_analysis(self):
+        """
+        Advanced voter bias analysis using statistical techniques
+        Note: Voter numbers are randomly assigned and do not correspond to player identities
+        """
+        print("\n" + "=" * 80)
+        print("ADVANCED VOTER BIAS ANALYSIS")
+        print("=" * 80)
+        print("NOTE: Voter numbers are randomly assigned for anonymity")
+        print("=" * 80)
+        
+        # 1. Voter Correlation Analysis
+        self._analyze_voter_correlations()
+        
+        # 2. Voting Pattern Clustering
+        self._analyze_voting_patterns()
+        
+        # 3. Statistical Significance Tests
+        self._statistical_significance_tests()
+        
+        # 4. Bias Type Classification
+        self._classify_bias_types()
+    
+    def _analyze_voter_correlations(self):
+        """Analyze correlations between voters to detect similar voting patterns"""
+        print("\n--- VOTER CORRELATION ANALYSIS ---")
+        print("Identifying voters with similar rating patterns...")
+        
+        if self.df is None:
+            return
+        
+        # Create a matrix of voter scores
+        voter_scores = {}
+        for voter in self.voters:
+            scores = []
+            for _, row in self.df.iterrows():
+                try:
+                    score = row[voter]
+                    if pd.notna(score) and str(score).strip():
+                        scores.append(float(score))
+                    else:
+                        scores.append(np.nan)
+                except:
+                    scores.append(np.nan)
+            voter_scores[voter] = scores
+        
+        # Calculate correlation matrix
+        voter_df = pd.DataFrame(voter_scores)
+        correlation_matrix = voter_df.corr()
+        
+        # Store correlation data
+        self.voter_correlations = correlation_matrix
+        
+        # Find highly correlated voter pairs (may indicate collusion or similar perspectives)
+        print("\nHighly Correlated Voters (correlation > 0.8):")
+        found_correlations = False
+        for i in range(len(self.voters)):
+            for j in range(i+1, len(self.voters)):
+                corr = correlation_matrix.iloc[i, j]
+                if corr > 0.8 and not np.isnan(corr):
+                    voter1_num = self.voter_analysis[self.voters[i]]['voter_number']
+                    voter2_num = self.voter_analysis[self.voters[j]]['voter_number']
+                    print(f"  - Voter {voter1_num} & Voter {voter2_num}: {corr:.3f}")
+                    found_correlations = True
+        
+        if not found_correlations:
+            print("  No highly correlated voter pairs found (good - indicates independent judgments)")
+        
+        # Find negatively correlated voters (opposite rating tendencies)
+        print("\nNegatively Correlated Voters (correlation < -0.5):")
+        found_neg_correlations = False
+        for i in range(len(self.voters)):
+            for j in range(i+1, len(self.voters)):
+                corr = correlation_matrix.iloc[i, j]
+                if corr < -0.5 and not np.isnan(corr):
+                    voter1_num = self.voter_analysis[self.voters[i]]['voter_number']
+                    voter2_num = self.voter_analysis[self.voters[j]]['voter_number']
+                    print(f"  - Voter {voter1_num} & Voter {voter2_num}: {corr:.3f}")
+                    found_neg_correlations = True
+        
+        if not found_neg_correlations:
+            print("  No strongly negatively correlated voters found")
+    
+    def _analyze_voting_patterns(self):
+        """Cluster voters by their voting patterns"""
+        print("\n--- VOTING PATTERN ANALYSIS ---")
+        print("Analyzing systematic biases in voting behavior...")
+        
+        # Categorize voters by their bias patterns
+        strict_voters = []
+        lenient_voters = []
+        balanced_voters = []
+        inconsistent_voters = []
+        
+        for voter, data in self.voter_analysis.items():
+            voter_num = data['voter_number']
+            mean = data['statistics']['mean']
+            std = data['statistics']['std']
+            
+            # Classification logic
+            if data['bias_indicators'].get('too_harsh', False):
+                strict_voters.append(voter_num)
+            elif data['bias_indicators'].get('too_generous', False):
+                lenient_voters.append(voter_num)
+            elif data['bias_indicators'].get('high_variance', False):
+                inconsistent_voters.append(voter_num)
+            else:
+                balanced_voters.append(voter_num)
+        
+        print(f"\nVoter Pattern Distribution:")
+        print(f"  - Strict/Harsh voters: {len(strict_voters)} - {strict_voters if strict_voters else 'None'}")
+        print(f"  - Lenient/Generous voters: {len(lenient_voters)} - {lenient_voters if lenient_voters else 'None'}")
+        print(f"  - Inconsistent voters: {len(inconsistent_voters)} - {inconsistent_voters if inconsistent_voters else 'None'}")
+        print(f"  - Balanced voters: {len(balanced_voters)} - {balanced_voters if balanced_voters else 'None'}")
+        
+        # Store pattern classifications
+        self.voter_patterns = {
+            'strict': strict_voters,
+            'lenient': lenient_voters,
+            'inconsistent': inconsistent_voters,
+            'balanced': balanced_voters
+        }
+    
+    def _statistical_significance_tests(self):
+        """Perform statistical tests to validate bias indicators"""
+        print("\n--- STATISTICAL SIGNIFICANCE TESTS ---")
+        print("Testing if voter biases are statistically significant...")
+        
+        if self.df is None:
+            return
+        
+        # Collect all voter means
+        voter_means = []
+        for voter, data in self.voter_analysis.items():
+            if data['statistics']['count'] > 0:
+                voter_means.append(data['statistics']['mean'])
+        
+        overall_mean = np.mean(voter_means)
+        overall_std = np.std(voter_means)
+        
+        print(f"\nOverall Statistics:")
+        print(f"  - Mean rating across all voters: {overall_mean:.2f}")
+        print(f"  - Std deviation of voter means: {overall_std:.2f}")
+        
+        # Test each voter for significant deviation
+        print("\nVoters with Statistically Significant Biases (p < 0.05):")
+        significant_biases = []
+        
+        for voter, data in self.voter_analysis.items():
+            if data['statistics']['count'] < 3:  # Need minimum sample size
+                continue
+            
+            voter_num = data['voter_number']
+            voter_mean = data['statistics']['mean']
+            voter_std = data['statistics']['std']
+            n = data['statistics']['count']
+            
+            # One-sample t-test against overall mean
+            # Calculate t-statistic
+            if voter_std > 0:
+                t_stat = (voter_mean - overall_mean) / (voter_std / np.sqrt(n))
+                # Two-tailed p-value (approximate)
+                p_value = 2 * (1 - stats.t.cdf(abs(t_stat), df=n-1))
+                
+                if p_value < 0.05:
+                    bias_type = "harsh" if voter_mean < overall_mean else "generous"
+                    significant_biases.append({
+                        'voter_num': voter_num,
+                        'mean': voter_mean,
+                        'bias_type': bias_type,
+                        'p_value': p_value
+                    })
+        
+        if significant_biases:
+            for bias in sorted(significant_biases, key=lambda x: x['p_value']):
+                print(f"  - Voter {bias['voter_num']}: {bias['bias_type'].upper()} "
+                      f"(mean={bias['mean']:.2f}, p={bias['p_value']:.4f})")
+        else:
+            print("  No statistically significant biases detected")
+        
+        self.significant_biases = significant_biases
+    
+    def _classify_bias_types(self):
+        """Classify and summarize different types of biases"""
+        print("\n--- BIAS TYPE CLASSIFICATION ---")
+        print("Categorizing voters by dominant bias characteristics...")
+        
+        bias_summary = {
+            'Scale Compression (Low Variance)': [],
+            'Scale Expansion (High Variance)': [],
+            'Systematic Overrating (Generous)': [],
+            'Systematic Underrating (Harsh)': [],
+            'Inconsistent Rating (High Std in Similar Skills)': [],
+            'Missing Data (Incomplete Ratings)': [],
+            'Well-Calibrated (Minimal Bias)': []
+        }
+        
+        for voter, data in self.voter_analysis.items():
+            voter_num = data['voter_number']
+            biases = data['bias_indicators']
+            
+            # Classify by dominant bias
+            if biases.get('low_variance', False):
+                bias_summary['Scale Compression (Low Variance)'].append(voter_num)
+            elif biases.get('high_variance', False):
+                bias_summary['Scale Expansion (High Variance)'].append(voter_num)
+            elif biases.get('too_generous', False):
+                bias_summary['Systematic Overrating (Generous)'].append(voter_num)
+            elif biases.get('too_harsh', False):
+                bias_summary['Systematic Underrating (Harsh)'].append(voter_num)
+            elif data['statistics'].get('missing_count', 0) > len(self.df) * 0.3:
+                bias_summary['Missing Data (Incomplete Ratings)'].append(voter_num)
+            else:
+                bias_summary['Well-Calibrated (Minimal Bias)'].append(voter_num)
+        
+        print("\nBias Type Summary:")
+        for bias_type, voters in bias_summary.items():
+            if voters:
+                print(f"  - {bias_type}: {len(voters)} voter(s) - {voters}")
+        
+        self.bias_type_summary = bias_summary
+        
+        # Overall assessment
+        total_voters = len(self.voter_analysis)
+        well_calibrated = len(bias_summary['Well-Calibrated (Minimal Bias)'])
+        
+        print(f"\n✓ Overall Bias Assessment:")
+        print(f"  - {well_calibrated}/{total_voters} ({100*well_calibrated/total_voters:.1f}%) voters are well-calibrated")
+        print(f"  - {total_voters - well_calibrated}/{total_voters} ({100*(total_voters-well_calibrated)/total_voters:.1f}%) voters show some form of bias")
     
     def generate_recommendations(self):
         """Generate recommendations based on analysis"""
@@ -597,12 +789,157 @@ class SoccerAnalysis:
         self.load_data()
         self.calculate_6_axis_ratings()
         self.analyze_voters()
+        self.advanced_voter_bias_analysis()  # New: Advanced bias analysis
         self.analyze_player_perception()
         self.generate_recommendations()
         
         print("\n" + "=" * 80)
         print("ANALYSIS COMPLETE")
         print("=" * 80)
+    
+    def get_filtered_voters(self):
+        """Get list of reliable voters (not harsh, reliability >= threshold)"""
+        filtered = []
+        excluded = []
+        
+        for voter, data in self.voter_analysis.items():
+            reliability = data['reliability_score']
+            is_harsh = data['bias_indicators'].get('too_harsh', False)
+            
+            if reliability >= self.RELIABILITY_FILTER_THRESHOLD and not is_harsh:
+                filtered.append(voter)
+            else:
+                reason = []
+                if reliability < self.RELIABILITY_FILTER_THRESHOLD:
+                    reason.append(f"reliability {reliability}% < {self.RELIABILITY_FILTER_THRESHOLD}%")
+                if is_harsh:
+                    reason.append("too harsh")
+                excluded.append({
+                    'voter': voter,
+                    'voter_num': data['voter_number'],
+                    'reliability': reliability,
+                    'reason': ', '.join(reason)
+                })
+        
+        return filtered, excluded
+    
+    def calculate_filtered_ratings(self):
+        """Calculate player ratings using only filtered voters"""
+        print("\n" + "=" * 80)
+        print("FILTERED ANALYSIS (Excluding Too Harsh & Low Reliability Voters)")
+        print("=" * 80)
+        
+        filtered_voters, excluded = self.get_filtered_voters()
+        
+        print(f"\n📊 Filtering Criteria:")
+        print(f"   - Minimum reliability: {self.RELIABILITY_FILTER_THRESHOLD}%")
+        print(f"   - Exclude 'too harsh' voters")
+        print(f"\n✓ Included voters: {len(filtered_voters)}")
+        print(f"✗ Excluded voters: {len(excluded)}")
+        
+        if excluded:
+            print("\nExcluded voters:")
+            for ex in excluded:
+                print(f"   - Voter {ex['voter_num']}: {ex['reason']}")
+        
+        self.filtered_player_ratings = {}
+        
+        if self.df is None:
+            return
+        
+        for player in self.players:
+            player_data = self.df[self.df['Name'] == player]
+            
+            ratings = {
+                'player_name': player,
+                'axis_ratings': {},
+                'overall_rating': 0,
+                'skill_details': {}
+            }
+            
+            # Calculate each axis using only filtered voters
+            for axis_name, skills in self.skill_categories.items():
+                axis_scores = []
+                
+                for skill in skills:
+                    skill_data = player_data[player_data['Skill'] == skill]
+                    if not skill_data.empty:
+                        scores = []
+                        for voter in filtered_voters:
+                            try:
+                                score = skill_data[voter].values[0]
+                                if pd.notna(score) and str(score).strip():
+                                    scores.append(float(score))
+                            except:
+                                continue
+                        
+                        if scores:
+                            avg_score = np.mean(scores)
+                            axis_scores.append(avg_score)
+                            ratings['skill_details'][skill] = {
+                                'scores': scores,
+                                'mean': avg_score,
+                                'std': np.std(scores),
+                                'median': np.median(scores),
+                                'min': min(scores),
+                                'max': max(scores)
+                            }
+                
+                if axis_scores:
+                    ratings['axis_ratings'][axis_name] = {
+                        'score': np.mean(axis_scores),
+                        'std': np.std(axis_scores)
+                    }
+            
+            # Calculate overall rating
+            axis_weights = {
+                'technical_ball_control': 0.20,
+                'shooting_finishing': 0.15,
+                'offensive_play': 0.15,
+                'defensive_play': 0.15,
+                'tactical_psychological': 0.20,
+                'physical_condition': 0.15
+            }
+            
+            overall = 0
+            total_weight = 0
+            for axis_name, weight in axis_weights.items():
+                if axis_name in ratings['axis_ratings']:
+                    overall += ratings['axis_ratings'][axis_name]['score'] * weight
+                    total_weight += weight
+            
+            if total_weight > 0:
+                ratings['overall_rating'] = overall / total_weight
+            
+            self.filtered_player_ratings[player] = ratings
+        
+        # Display comparison
+        self._display_filtered_comparison()
+        
+        return self.filtered_player_ratings
+    
+    def _display_filtered_comparison(self):
+        """Display comparison between all voters and filtered voters"""
+        print("\n" + "-" * 80)
+        print("COMPARISON: ALL VOTERS vs FILTERED VOTERS")
+        print("-" * 80)
+        
+        comparison_data = []
+        for player in self.players:
+            all_rating = self.player_ratings[player]['overall_rating']
+            filtered_rating = self.filtered_player_ratings[player]['overall_rating']
+            diff = filtered_rating - all_rating
+            
+            comparison_data.append({
+                'Player': player,
+                'All Voters': round(all_rating, 2),
+                'Filtered': round(filtered_rating, 2),
+                'Difference': round(diff, 2)
+            })
+        
+        comparison_df = pd.DataFrame(comparison_data)
+        comparison_df = comparison_df.sort_values('Filtered', ascending=False)
+        print(comparison_df.to_string(index=False))
 
 
 def main():
@@ -614,6 +951,9 @@ def main():
     
     analyzer = SoccerAnalysis('upk_halisaha.csv')
     analyzer.run_complete_analysis()
+    
+    # Calculate filtered ratings (excluding harsh and low reliability voters)
+    analyzer.calculate_filtered_ratings()
     
     # Create visualizations
     try:

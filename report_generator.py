@@ -31,20 +31,20 @@ def generate_text_report(analyzer, output_file='analysis_output/SUMMARY_REPORT.t
             summary_data.append((player, data['overall_rating']))
         summary_data.sort(key=lambda x: x[1], reverse=True)
         
-        f.write("\nEn İyi 3 Oyuncu:\n")
+        f.write("\nEn İyi 3 Oyuncu (Tüm Oylar):\n")
         for i, (player, rating) in enumerate(summary_data[:3], 1):
             f.write(f"  {i}. {player}: {rating:.2f}/10\n")
         
         # Voter reliability summary
         reliable_voters = sum(1 for v in analyzer.voter_analysis.values() 
-                            if v['reliability_score'] >= 70)
+                            if v['reliability_score'] >= 75)
         total_voters = len(analyzer.voter_analysis)
-        f.write(f"\nVeri Kalitesi: {reliable_voters}/{total_voters} oylayıcı güvenilir (≥70%)\n")
+        f.write(f"\nVeri Kalitesi: {reliable_voters}/{total_voters} oylayıcı güvenilir (≥75%)\n")
         
-        # Self-bias summary
-        self_biased = sum(1 for v in analyzer.voter_analysis.values() 
-                         if v['bias_indicators'].get('self_bias', False))
-        f.write(f"Kendine Bias: {self_biased} oylayıcıda tespit edildi\n")
+        # Harsh voters summary
+        harsh_voters = sum(1 for v in analyzer.voter_analysis.values() 
+                         if v['bias_indicators'].get('too_harsh', False))
+        f.write(f"Çok Sert Oylayıcı: {harsh_voters} oylayıcı tespit edildi\n")
         
         f.write("\n" + "=" * 80 + "\n\n")
         
@@ -91,12 +91,7 @@ def generate_text_report(analyzer, output_file='analysis_output/SUMMARY_REPORT.t
             f.write(f"  - Ortalama Puan: {data['statistics']['mean']:.2f}\n")
             f.write(f"  - Standart Sapma: {data['statistics']['std']:.2f}\n")
             
-            # Flags
-            if data['bias_indicators'].get('self_bias'):
-                player = data['bias_indicators'].get('player_name', 'Bilinmiyor')
-                diff = data['bias_indicators'].get('self_vs_others_diff', 0)
-                f.write(f"  ⚠️  KENDİNE BIAS: {player} (+{diff:.2f} puan)\n")
-            
+            # Flags (self-bias removed since voter order is random)
             if data['bias_indicators'].get('too_generous'):
                 f.write(f"  ⚠️  ÇOK CÖMERT (ortalama üstü puanlama)\n")
             
@@ -128,11 +123,8 @@ def generate_text_report(analyzer, output_file='analysis_output/SUMMARY_REPORT.t
             f.write("   ❌ Veri kalitesi DÜŞÜK - sonuçlar şüpheli\n")
         
         f.write("\n2. BIAS VE ÖNYARGı:\n")
-        if self_biased > 0:
-            f.write(f"   - {self_biased} oylayıcı kendine yüksek puan verme eğiliminde\n")
-            f.write("   Öneri: Bu oylayıcıların puanları daha düşük ağırlıkla değerlendirilmeli\n")
-        else:
-            f.write("   ✓ Kendine bias tespit edilmedi\n")
+        # Note: Self-bias detection removed since voter order is random
+        f.write("   NOT: Kendine bias tespiti yapılamamaktadır (oylayıcı sırası rastgele)\n")
         
         generous = sum(1 for v in analyzer.voter_analysis.values() 
                       if v['bias_indicators'].get('too_generous', False))
@@ -188,6 +180,51 @@ def generate_text_report(analyzer, output_file='analysis_output/SUMMARY_REPORT.t
         for axis_name, avg in sorted_axes[-3:]:
             tr_name = axis_names_tr.get(axis_name, axis_name)
             f.write(f"   ⚠️  {tr_name}: {avg:.2f}\n")
+        
+        # FILTERED ANALYSIS SECTION
+        if hasattr(analyzer, 'filtered_player_ratings') and analyzer.filtered_player_ratings:
+            f.write("\n" + "=" * 80 + "\n\n")
+            f.write("FİLTRELENMİŞ ANALİZ\n")
+            f.write("(Çok Sert ve Güvenilirliği <%75 Olan Oylayıcılar Hariç)\n")
+            f.write("-" * 80 + "\n\n")
+            
+            # Get filtered voters info
+            filtered_voters, excluded = analyzer.get_filtered_voters()
+            f.write(f"Dahil Edilen Oylayıcı Sayısı: {len(filtered_voters)}\n")
+            f.write(f"Hariç Tutulan Oylayıcı Sayısı: {len(excluded)}\n\n")
+            
+            if excluded:
+                f.write("Hariç Tutulan Oylayıcılar:\n")
+                for ex in excluded:
+                    f.write(f"   - Oylayıcı {ex['voter_num']}: {ex['reason']}\n")
+                f.write("\n")
+            
+            # Filtered top 5 players
+            filtered_summary = []
+            for player, data in analyzer.filtered_player_ratings.items():
+                filtered_summary.append((player, data['overall_rating']))
+            filtered_summary.sort(key=lambda x: x[1], reverse=True)
+            
+            f.write("FİLTRELENMİŞ SIRALAMA - EN İYİ 5 OYUNCU:\n")
+            for i, (player, rating) in enumerate(filtered_summary[:5], 1):
+                # Also show difference from all-voters rating
+                all_rating = analyzer.player_ratings[player]['overall_rating']
+                diff = rating - all_rating
+                diff_str = f"({diff:+.2f})" if diff != 0 else ""
+                f.write(f"   {i}. {player}: {rating:.2f}/10 {diff_str}\n")
+            
+            # Comparison table
+            f.write("\n\nKARŞILAŞTIRMA TABLOSU (Tüm Oylar vs Filtrelenmiş):\n")
+            f.write("-" * 60 + "\n")
+            f.write(f"{'Oyuncu':<25} {'Tüm Oylar':>12} {'Filtrelenmiş':>12} {'Fark':>8}\n")
+            f.write("-" * 60 + "\n")
+            
+            for player, filt_rating in filtered_summary:
+                all_rating = analyzer.player_ratings[player]['overall_rating']
+                diff = filt_rating - all_rating
+                f.write(f"{player:<25} {all_rating:>12.2f} {filt_rating:>12.2f} {diff:>+8.2f}\n")
+            
+            f.write("-" * 60 + "\n")
         
         f.write("\n" + "=" * 80 + "\n")
         f.write("RAPOR SONU\n")

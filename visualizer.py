@@ -35,12 +35,17 @@ class SoccerVisualizer:
         
         # Create individual plots
         self.plot_player_rankings()
-        self.plot_6axis_radar()
+        self.plot_6axis_radar_all()  # For ALL players
         self.plot_voter_reliability()
-        self.plot_self_bias()
         self.plot_player_heatmap()
         self.plot_voter_distributions()
-        self.plot_skill_comparison()
+        self.plot_skill_comparison_all()  # For ALL players
+        
+        # Create filtered analysis visualizations
+        if hasattr(self.analyzer, 'filtered_player_ratings'):
+            self.plot_filtered_comparison()
+            self.plot_filtered_rankings()
+            self.plot_filtered_radar_all()
         
         # Create comprehensive PDF report
         self.create_pdf_report()
@@ -85,20 +90,21 @@ class SoccerVisualizer:
         print("✓ Created player rankings chart")
     
     def plot_6axis_radar(self):
-        """Create radar charts for top players"""
-        # Get top 6 players
-        summary_data = []
-        for player, data in self.analyzer.player_ratings.items():
-            summary_data.append({
-                'Player': player,
-                'Overall': data['overall_rating']
-            })
-        summary_df = pd.DataFrame(summary_data).sort_values('Overall', ascending=False)
-        top_players = summary_df.head(6)['Player'].tolist()
+        """Create radar charts for top players (legacy - for backward compatibility)"""
+        self.plot_6axis_radar_all()
+    
+    def plot_6axis_radar_all(self):
+        """Create radar charts for ALL players"""
+        players = list(self.analyzer.player_ratings.keys())
+        num_players = len(players)
+        
+        # Calculate grid size
+        cols = 4
+        rows = (num_players + cols - 1) // cols
         
         # Create subplot grid
-        fig, axes = plt.subplots(2, 3, figsize=(18, 12), subplot_kw=dict(projection='polar'))
-        axes = axes.flatten()
+        fig, axes = plt.subplots(rows, cols, figsize=(20, 5*rows), subplot_kw=dict(projection='polar'))
+        axes = axes.flatten() if num_players > 1 else [axes]
         
         # Axis categories
         categories = [
@@ -123,7 +129,12 @@ class SoccerVisualizer:
         angles = np.linspace(0, 2 * np.pi, N, endpoint=False).tolist()
         angles += angles[:1]
         
-        for idx, player in enumerate(top_players):
+        # Sort players by overall rating
+        sorted_players = sorted(players, 
+            key=lambda p: self.analyzer.player_ratings[p]['overall_rating'], 
+            reverse=True)
+        
+        for idx, player in enumerate(sorted_players):
             ax = axes[idx]
             data = self.analyzer.player_ratings[player]
             
@@ -139,20 +150,24 @@ class SoccerVisualizer:
             ax.plot(angles, values, 'o-', linewidth=2, label=player, color='#2E86AB')
             ax.fill(angles, values, alpha=0.25, color='#2E86AB')
             ax.set_xticks(angles[:-1])
-            ax.set_xticklabels(categories, size=9)
+            ax.set_xticklabels(categories, size=8)
             ax.set_ylim(0, 10)
             ax.set_yticks([2, 4, 6, 8, 10])
-            ax.set_yticklabels(['2', '4', '6', '8', '10'], size=8)
+            ax.set_yticklabels(['2', '4', '6', '8', '10'], size=7)
             ax.grid(True, alpha=0.3)
             ax.set_title(f'{player}\nOverall: {data["overall_rating"]:.2f}', 
-                        fontweight='bold', size=11, pad=15)
+                        fontweight='bold', size=10, pad=10)
         
-        plt.suptitle('Top 6 Players - 6-Axis Radar Analysis', 
-                    fontweight='bold', fontsize=16, y=0.98)
+        # Hide empty subplots
+        for idx in range(num_players, len(axes)):
+            axes[idx].set_visible(False)
+        
+        plt.suptitle('ALL Players - 6-Axis Radar Analysis', 
+                    fontweight='bold', fontsize=16, y=1.01)
         plt.tight_layout()
         plt.savefig(f'{self.output_dir}/02_6axis_radar.png', dpi=300, bbox_inches='tight')
         plt.close()
-        print("✓ Created 6-axis radar charts")
+        print("✓ Created 6-axis radar charts for ALL players")
     
     def plot_voter_reliability(self):
         """Create voter reliability chart"""
@@ -196,60 +211,8 @@ class SoccerVisualizer:
         plt.close()
         print("✓ Created voter reliability chart")
     
-    def plot_self_bias(self):
-        """Create self-bias analysis chart"""
-        fig, ax = plt.subplots(figsize=(14, 8))
-        
-        # Collect self-bias data
-        bias_data = []
-        for voter, data in self.analyzer.voter_analysis.items():
-            if 'self_vs_others_diff' in data['bias_indicators']:
-                bias_data.append({
-                    'Voter': f"Voter {data['voter_number']}",
-                    'Player': data['bias_indicators'].get('player_name', 'Unknown'),
-                    'Difference': data['bias_indicators']['self_vs_others_diff'],
-                    'Self_Rating': data['bias_indicators']['self_rating_avg'],
-                    'Others_Rating': data['bias_indicators']['others_rating_avg']
-                })
-        
-        if bias_data:
-            df = pd.DataFrame(bias_data)
-            df = df.sort_values('Difference', ascending=False)
-            
-            # Create grouped bar chart
-            x = np.arange(len(df))
-            width = 0.35
-            
-            bars1 = ax.bar(x - width/2, df['Self_Rating'], width, 
-                          label='Self Rating', color='#e57373', edgecolor='black')
-            bars2 = ax.bar(x + width/2, df['Others_Rating'], width, 
-                          label='Others Rating', color='#64b5f6', edgecolor='black')
-            
-            # Add difference annotations
-            for i, row in df.iterrows():
-                diff = row['Difference']
-                if diff > 1.0:
-                    ax.annotate(f'+{diff:.2f}', 
-                              xy=(i, max(row['Self_Rating'], row['Others_Rating']) + 0.3),
-                              ha='center', fontweight='bold', color='red', fontsize=11)
-            
-            ax.set_xlabel('Voter (Player Name)', fontweight='bold', fontsize=12)
-            ax.set_ylabel('Average Rating', fontweight='bold', fontsize=12)
-            ax.set_title('Self-Bias Analysis: Self-Rating vs Rating Others', 
-                        fontweight='bold', fontsize=14, pad=20)
-            ax.set_xticks(x)
-            ax.set_xticklabels([f"{row['Voter']}\n({row['Player']})" 
-                               for _, row in df.iterrows()], rotation=0)
-            ax.legend()
-            ax.grid(axis='y', alpha=0.3)
-            ax.set_ylim(0, 10)
-            
-            plt.tight_layout()
-            plt.savefig(f'{self.output_dir}/04_self_bias.png', dpi=300, bbox_inches='tight')
-            plt.close()
-            print("✓ Created self-bias analysis chart")
-        else:
-            print("⚠ No self-bias data to visualize")
+    # NOTE: plot_self_bias method removed because voter order is random
+    # and we don't have reliable voter-to-player mapping data
     
     def plot_player_heatmap(self):
         """Create heatmap of player skills"""
@@ -356,10 +319,14 @@ class SoccerVisualizer:
         print("✓ Created voter distribution charts")
     
     def plot_skill_comparison(self):
-        """Create skill comparison across top players"""
-        fig, ax = plt.subplots(figsize=(16, 10))
+        """Create skill comparison for ALL players (legacy - calls new function)"""
+        self.plot_skill_comparison_all()
+    
+    def plot_skill_comparison_all(self):
+        """Create skill comparison across ALL players"""
+        fig, ax = plt.subplots(figsize=(20, 12))
         
-        # Get top 8 players
+        # Get ALL players sorted by overall rating
         summary_data = []
         for player, data in self.analyzer.player_ratings.items():
             summary_data.append({
@@ -367,7 +334,7 @@ class SoccerVisualizer:
                 'Overall': data['overall_rating']
             })
         summary_df = pd.DataFrame(summary_data).sort_values('Overall', ascending=False)
-        top_players = summary_df.head(8)['Player'].tolist()
+        all_players = summary_df['Player'].tolist()
         
         # Axis categories
         categories = ['Technical\nBall Control', 'Shooting &\nFinishing', 
@@ -384,11 +351,11 @@ class SoccerVisualizer:
         }
         
         x = np.arange(len(categories))
-        width = 0.1
+        width = 0.8 / len(all_players)  # Adjust width based on number of players
         
-        colors = plt.cm.Set3(np.linspace(0, 1, len(top_players)))
+        colors = plt.cm.tab20(np.linspace(0, 1, len(all_players)))
         
-        for i, player in enumerate(top_players):
+        for i, player in enumerate(all_players):
             data = self.analyzer.player_ratings[player]
             values = [0] * len(categories)
             
@@ -396,31 +363,188 @@ class SoccerVisualizer:
                 if axis_name in data['axis_ratings']:
                     values[pos] = data['axis_ratings'][axis_name]['score']
             
-            offset = width * (i - len(top_players)/2)
-            ax.bar(x + offset, values, width, label=player[:15], 
-                  color=colors[i], edgecolor='black', linewidth=0.5)
+            offset = width * (i - len(all_players)/2)
+            ax.bar(x + offset, values, width, label=player[:12], 
+                  color=colors[i], edgecolor='black', linewidth=0.3)
         
         ax.set_xlabel('Skill Category', fontweight='bold', fontsize=12)
         ax.set_ylabel('Rating (0-10)', fontweight='bold', fontsize=12)
-        ax.set_title('Top 8 Players - Skill Category Comparison', 
+        ax.set_title('ALL Players - Skill Category Comparison', 
                     fontweight='bold', fontsize=14, pad=20)
         ax.set_xticks(x)
         ax.set_xticklabels(categories)
-        ax.legend(loc='upper left', bbox_to_anchor=(1, 1), fontsize=9)
+        ax.legend(loc='upper left', bbox_to_anchor=(1, 1), fontsize=8, ncol=1)
         ax.set_ylim(0, 10)
         ax.grid(axis='y', alpha=0.3)
         
         plt.tight_layout()
-        plt.savefig(f'{self.output_dir}/07_skill_comparison.png', dpi=300, bbox_inches='tight')
+        plt.savefig(f'{self.output_dir}/04_skill_comparison.png', dpi=300, bbox_inches='tight')
         plt.close()
-        print("✓ Created skill comparison chart")
+        print("✓ Created skill comparison chart for ALL players")
+    
+    def plot_filtered_comparison(self):
+        """Create comparison chart between all voters and filtered voters"""
+        fig, ax = plt.subplots(figsize=(16, 10))
+        
+        players = list(self.analyzer.player_ratings.keys())
+        
+        # Sort by filtered rating
+        sorted_players = sorted(players,
+            key=lambda p: self.analyzer.filtered_player_ratings[p]['overall_rating'],
+            reverse=True)
+        
+        x = np.arange(len(sorted_players))
+        width = 0.35
+        
+        all_ratings = [self.analyzer.player_ratings[p]['overall_rating'] for p in sorted_players]
+        filtered_ratings = [self.analyzer.filtered_player_ratings[p]['overall_rating'] for p in sorted_players]
+        
+        bars1 = ax.bar(x - width/2, all_ratings, width, label='All Voters', 
+                      color='#64b5f6', edgecolor='black', linewidth=0.5)
+        bars2 = ax.bar(x + width/2, filtered_ratings, width, label='Filtered (No Harsh, ≥75% Reliability)', 
+                      color='#81c784', edgecolor='black', linewidth=0.5)
+        
+        # Add difference annotations
+        for i, (all_r, filt_r) in enumerate(zip(all_ratings, filtered_ratings)):
+            diff = filt_r - all_r
+            color = 'green' if diff > 0 else 'red' if diff < 0 else 'black'
+            ax.annotate(f'{diff:+.2f}', xy=(i, max(all_r, filt_r) + 0.2),
+                       ha='center', fontsize=8, color=color, fontweight='bold')
+        
+        ax.set_xlabel('Player', fontweight='bold', fontsize=12)
+        ax.set_ylabel('Overall Rating (0-10)', fontweight='bold', fontsize=12)
+        ax.set_title('Rating Comparison: All Voters vs Filtered Voters\n(Filtered = Excluding Too Harsh & Low Reliability <75%)', 
+                    fontweight='bold', fontsize=14, pad=20)
+        ax.set_xticks(x)
+        ax.set_xticklabels(sorted_players, rotation=45, ha='right', fontsize=9)
+        ax.legend(loc='upper right')
+        ax.set_ylim(0, 10)
+        ax.grid(axis='y', alpha=0.3)
+        
+        plt.tight_layout()
+        plt.savefig(f'{self.output_dir}/07_filtered_comparison.png', dpi=300, bbox_inches='tight')
+        plt.close()
+        print("✓ Created filtered comparison chart")
+    
+    def plot_filtered_rankings(self):
+        """Create filtered player rankings bar chart"""
+        fig, ax = plt.subplots(figsize=(14, 10))
+        
+        # Prepare data
+        players = []
+        ratings = []
+        for player, data in self.analyzer.filtered_player_ratings.items():
+            players.append(player)
+            ratings.append(data['overall_rating'])
+        
+        # Sort by rating
+        sorted_data = sorted(zip(players, ratings), key=lambda x: x[1], reverse=True)
+        players, ratings = zip(*sorted_data)
+        
+        # Create color gradient
+        colors = plt.cm.RdYlGn(np.array(ratings) / 10)
+        
+        # Create bar chart
+        bars = ax.barh(players, ratings, color=colors, edgecolor='black', linewidth=0.5)
+        
+        # Add value labels
+        for i, (player, rating) in enumerate(zip(players, ratings)):
+            ax.text(rating + 0.1, i, f'{rating:.2f}', va='center', fontweight='bold')
+        
+        ax.set_xlabel('Overall Rating (0-10)', fontweight='bold', fontsize=12)
+        ax.set_ylabel('Player', fontweight='bold', fontsize=12)
+        ax.set_title('FILTERED Player Rankings\n(Excluding Too Harsh & Low Reliability <75% Voters)', 
+                    fontweight='bold', fontsize=14, pad=20)
+        ax.set_xlim(0, 10)
+        ax.grid(axis='x', alpha=0.3)
+        
+        plt.tight_layout()
+        plt.savefig(f'{self.output_dir}/08_filtered_rankings.png', dpi=300, bbox_inches='tight')
+        plt.close()
+        print("✓ Created filtered player rankings chart")
+    
+    def plot_filtered_radar_all(self):
+        """Create radar charts for ALL players using filtered data"""
+        players = list(self.analyzer.filtered_player_ratings.keys())
+        num_players = len(players)
+        
+        # Calculate grid size
+        cols = 4
+        rows = (num_players + cols - 1) // cols
+        
+        # Create subplot grid
+        fig, axes = plt.subplots(rows, cols, figsize=(20, 5*rows), subplot_kw=dict(projection='polar'))
+        axes = axes.flatten() if num_players > 1 else [axes]
+        
+        # Axis categories
+        categories = [
+            'Technical\nBall Control',
+            'Shooting &\nFinishing',
+            'Offensive\nPlay',
+            'Defensive\nPlay',
+            'Tactical/\nPsychological',
+            'Physical/\nCondition'
+        ]
+        
+        axis_map = {
+            'technical_ball_control': 0,
+            'shooting_finishing': 1,
+            'offensive_play': 2,
+            'defensive_play': 3,
+            'tactical_psychological': 4,
+            'physical_condition': 5
+        }
+        
+        N = len(categories)
+        angles = np.linspace(0, 2 * np.pi, N, endpoint=False).tolist()
+        angles += angles[:1]
+        
+        # Sort players by overall rating
+        sorted_players = sorted(players, 
+            key=lambda p: self.analyzer.filtered_player_ratings[p]['overall_rating'], 
+            reverse=True)
+        
+        for idx, player in enumerate(sorted_players):
+            ax = axes[idx]
+            data = self.analyzer.filtered_player_ratings[player]
+            
+            # Get axis values
+            values = [0] * N
+            for axis_name, pos in axis_map.items():
+                if axis_name in data['axis_ratings']:
+                    values[pos] = data['axis_ratings'][axis_name]['score']
+            
+            values += values[:1]
+            
+            # Plot with different color for filtered
+            ax.plot(angles, values, 'o-', linewidth=2, label=player, color='#4CAF50')
+            ax.fill(angles, values, alpha=0.25, color='#4CAF50')
+            ax.set_xticks(angles[:-1])
+            ax.set_xticklabels(categories, size=8)
+            ax.set_ylim(0, 10)
+            ax.set_yticks([2, 4, 6, 8, 10])
+            ax.set_yticklabels(['2', '4', '6', '8', '10'], size=7)
+            ax.grid(True, alpha=0.3)
+            ax.set_title(f'{player}\nFiltered: {data["overall_rating"]:.2f}', 
+                        fontweight='bold', size=10, pad=10)
+        
+        # Hide empty subplots
+        for idx in range(num_players, len(axes)):
+            axes[idx].set_visible(False)
+        
+        plt.suptitle('ALL Players - FILTERED 6-Axis Radar Analysis\n(Excluding Too Harsh & Low Reliability <75% Voters)', 
+                    fontweight='bold', fontsize=16, y=1.01)
+        plt.tight_layout()
+        plt.savefig(f'{self.output_dir}/09_filtered_radar.png', dpi=300, bbox_inches='tight')
+        plt.close()
+        print("✓ Created FILTERED 6-axis radar charts for ALL players")
     
     def create_pdf_report(self):
         """Create comprehensive PDF report"""
         pdf_path = f'{self.output_dir}/Soccer_Analysis_Report.pdf'
         
         with PdfPages(pdf_path) as pdf:
-            # Page 1: Player Rankings
+            # Page 1: Player Rankings (All Voters)
             img = plt.imread(f'{self.output_dir}/01_player_rankings.png')
             fig, ax = plt.subplots(figsize=(11, 8.5))
             ax.imshow(img)
@@ -428,7 +552,7 @@ class SoccerVisualizer:
             pdf.savefig(fig, bbox_inches='tight')
             plt.close()
             
-            # Page 2: Radar Charts
+            # Page 2: Radar Charts (All Voters)
             img = plt.imread(f'{self.output_dir}/02_6axis_radar.png')
             fig, ax = plt.subplots(figsize=(11, 8.5))
             ax.imshow(img)
@@ -444,9 +568,9 @@ class SoccerVisualizer:
             pdf.savefig(fig, bbox_inches='tight')
             plt.close()
             
-            # Page 4: Self Bias
-            if os.path.exists(f'{self.output_dir}/04_self_bias.png'):
-                img = plt.imread(f'{self.output_dir}/04_self_bias.png')
+            # Page 4: Skill Comparison
+            if os.path.exists(f'{self.output_dir}/04_skill_comparison.png'):
+                img = plt.imread(f'{self.output_dir}/04_skill_comparison.png')
                 fig, ax = plt.subplots(figsize=(11, 8.5))
                 ax.imshow(img)
                 ax.axis('off')
@@ -469,12 +593,31 @@ class SoccerVisualizer:
             pdf.savefig(fig, bbox_inches='tight')
             plt.close()
             
-            # Page 7: Skill Comparison
-            img = plt.imread(f'{self.output_dir}/07_skill_comparison.png')
-            fig, ax = plt.subplots(figsize=(11, 8.5))
-            ax.imshow(img)
-            ax.axis('off')
-            pdf.savefig(fig, bbox_inches='tight')
-            plt.close()
+            # Page 7: Filtered Comparison
+            if os.path.exists(f'{self.output_dir}/07_filtered_comparison.png'):
+                img = plt.imread(f'{self.output_dir}/07_filtered_comparison.png')
+                fig, ax = plt.subplots(figsize=(11, 8.5))
+                ax.imshow(img)
+                ax.axis('off')
+                pdf.savefig(fig, bbox_inches='tight')
+                plt.close()
+            
+            # Page 8: Filtered Rankings
+            if os.path.exists(f'{self.output_dir}/08_filtered_rankings.png'):
+                img = plt.imread(f'{self.output_dir}/08_filtered_rankings.png')
+                fig, ax = plt.subplots(figsize=(11, 8.5))
+                ax.imshow(img)
+                ax.axis('off')
+                pdf.savefig(fig, bbox_inches='tight')
+                plt.close()
+            
+            # Page 9: Filtered Radar Charts
+            if os.path.exists(f'{self.output_dir}/09_filtered_radar.png'):
+                img = plt.imread(f'{self.output_dir}/09_filtered_radar.png')
+                fig, ax = plt.subplots(figsize=(11, 8.5))
+                ax.imshow(img)
+                ax.axis('off')
+                pdf.savefig(fig, bbox_inches='tight')
+                plt.close()
         
         print(f"\n✓ PDF report created: {pdf_path}")

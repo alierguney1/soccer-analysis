@@ -598,6 +598,16 @@ def main():
     
     analyzer = SoccerAnalysis('upk_halisaha.csv')
     analyzer.run_complete_analysis()
+    
+    # Create visualizations
+    try:
+        from visualizer import SoccerVisualizer
+        visualizer = SoccerVisualizer(analyzer)
+        visualizer.create_all_visualizations()
+    except ImportError as e:
+        print(f"\n⚠️  Could not import visualizer: {e}")
+    except Exception as e:
+        print(f"\n⚠️  Error creating visualizations: {e}")
 
 
 if __name__ == '__main__':

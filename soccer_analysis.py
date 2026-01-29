@@ -48,6 +48,8 @@ class SoccerAnalysis:
         self.skill_categories = {}
         self.player_ratings = {}
         self.voter_analysis = {}
+        self.reliable_100_player_ratings = {}
+        self.top8_player_ratings = {}
         
     def load_data(self):
         """Load and parse the CSV data"""
@@ -940,6 +942,333 @@ class SoccerAnalysis:
         comparison_df = pd.DataFrame(comparison_data)
         comparison_df = comparison_df.sort_values('Filtered', ascending=False)
         print(comparison_df.to_string(index=False))
+    
+    def get_100_percent_reliable_voters(self):
+        """Get list of 100% reliable voters only"""
+        reliable_100 = []
+        excluded = []
+        
+        for voter, data in self.voter_analysis.items():
+            reliability = data['reliability_score']
+            
+            if reliability == 100:
+                reliable_100.append(voter)
+            else:
+                excluded.append({
+                    'voter': voter,
+                    'voter_num': data['voter_number'],
+                    'reliability': reliability,
+                    'reason': f'reliability {reliability}% < 100%'
+                })
+        
+        return reliable_100, excluded
+    
+    def calculate_100_percent_reliable_ratings(self):
+        """Calculate player ratings using only 100% reliable voters"""
+        print("\n" + "=" * 80)
+        print("100% RELIABLE DATA ANALYSIS")
+        print("=" * 80)
+        
+        reliable_voters, excluded = self.get_100_percent_reliable_voters()
+        
+        print(f"\n📊 Filtering Criteria:")
+        print(f"   - Only 100% reliability voters included")
+        print(f"\n✓ Included voters: {len(reliable_voters)}")
+        print(f"✗ Excluded voters: {len(excluded)}")
+        
+        if excluded:
+            print("\nExcluded voters:")
+            for ex in excluded:
+                print(f"   - Voter {ex['voter_num']}: {ex['reason']}")
+        
+        self.reliable_100_player_ratings = {}
+        
+        if self.df is None:
+            return
+        
+        for player in self.players:
+            player_data = self.df[self.df['Name'] == player]
+            
+            ratings = {
+                'player_name': player,
+                'axis_ratings': {},
+                'overall_rating': 0,
+                'skill_details': {}
+            }
+            
+            # Calculate each axis using only 100% reliable voters
+            for axis_name, skills in self.skill_categories.items():
+                axis_scores = []
+                
+                for skill in skills:
+                    skill_data = player_data[player_data['Skill'] == skill]
+                    if not skill_data.empty:
+                        scores = []
+                        for voter in reliable_voters:
+                            try:
+                                score = skill_data[voter].values[0]
+                                if pd.notna(score) and str(score).strip():
+                                    scores.append(float(score))
+                            except:
+                                continue
+                        
+                        if scores:
+                            avg_score = np.mean(scores)
+                            axis_scores.append(avg_score)
+                            ratings['skill_details'][skill] = {
+                                'scores': scores,
+                                'mean': avg_score,
+                                'std': np.std(scores),
+                                'median': np.median(scores),
+                                'min': min(scores),
+                                'max': max(scores)
+                            }
+                
+                if axis_scores:
+                    ratings['axis_ratings'][axis_name] = {
+                        'score': np.mean(axis_scores),
+                        'std': np.std(axis_scores)
+                    }
+            
+            # Calculate overall rating
+            axis_weights = {
+                'technical_ball_control': 0.20,
+                'shooting_finishing': 0.15,
+                'offensive_play': 0.15,
+                'defensive_play': 0.15,
+                'tactical_psychological': 0.20,
+                'physical_condition': 0.15
+            }
+            
+            overall = 0
+            total_weight = 0
+            for axis_name, weight in axis_weights.items():
+                if axis_name in ratings['axis_ratings']:
+                    overall += ratings['axis_ratings'][axis_name]['score'] * weight
+                    total_weight += weight
+            
+            if total_weight > 0:
+                ratings['overall_rating'] = overall / total_weight
+            
+            self.reliable_100_player_ratings[player] = ratings
+        
+        # Display comparison
+        self._display_100_reliable_comparison()
+        
+        return self.reliable_100_player_ratings
+    
+    def _display_100_reliable_comparison(self):
+        """Display comparison between all voters and 100% reliable voters"""
+        print("\n" + "-" * 80)
+        print("COMPARISON: ALL VOTERS vs 100% RELIABLE VOTERS")
+        print("-" * 80)
+        
+        comparison_data = []
+        for player in self.players:
+            all_rating = self.player_ratings[player]['overall_rating']
+            reliable_rating = self.reliable_100_player_ratings[player]['overall_rating']
+            diff = reliable_rating - all_rating
+            
+            comparison_data.append({
+                'Player': player,
+                'All Voters': round(all_rating, 2),
+                '100% Reliable': round(reliable_rating, 2),
+                'Difference': round(diff, 2)
+            })
+        
+        comparison_df = pd.DataFrame(comparison_data)
+        comparison_df = comparison_df.sort_values('100% Reliable', ascending=False)
+        print(comparison_df.to_string(index=False))
+    
+    def calculate_top8_features_rating(self):
+        """Calculate rating based on average of top 8 rated features for each player"""
+        print("\n" + "=" * 80)
+        print("TOP 8 FEATURES RATING ANALYSIS")
+        print("=" * 80)
+        
+        self.top8_player_ratings = {}
+        
+        for player in self.players:
+            player_data = self.player_ratings[player]
+            
+            # Collect all individual skill ratings
+            all_skill_ratings = []
+            for skill, details in player_data['skill_details'].items():
+                all_skill_ratings.append({
+                    'skill': skill,
+                    'rating': details['mean']
+                })
+            
+            # Sort by rating descending and take top 8
+            all_skill_ratings.sort(key=lambda x: x['rating'], reverse=True)
+            top_8_skills = all_skill_ratings[:8]
+            
+            # Calculate average of top 8
+            if top_8_skills:
+                top8_avg = np.mean([s['rating'] for s in top_8_skills])
+            else:
+                top8_avg = 0
+            
+            self.top8_player_ratings[player] = {
+                'player_name': player,
+                'top8_rating': top8_avg,
+                'top8_skills': top_8_skills,
+                'num_skills': len(all_skill_ratings)
+            }
+        
+        # Display results
+        self._display_top8_ratings()
+        
+        return self.top8_player_ratings
+    
+    def _display_top8_ratings(self):
+        """Display top 8 features rating results"""
+        print("\n" + "-" * 80)
+        print("TOP 8 FEATURES RATING SUMMARY")
+        print("-" * 80)
+        
+        # Sort by top8 rating
+        sorted_players = sorted(self.top8_player_ratings.items(), 
+                               key=lambda x: x[1]['top8_rating'], 
+                               reverse=True)
+        
+        comparison_data = []
+        for player, data in sorted_players:
+            overall_rating = self.player_ratings[player]['overall_rating']
+            top8_rating = data['top8_rating']
+            diff = top8_rating - overall_rating
+            
+            comparison_data.append({
+                'Player': player,
+                'Overall Rating': round(overall_rating, 2),
+                'Top 8 Avg': round(top8_rating, 2),
+                'Difference': round(diff, 2)
+            })
+        
+        comparison_df = pd.DataFrame(comparison_data)
+        print(comparison_df.to_string(index=False))
+        
+        # Show top 5 with their best skills
+        print("\n" + "-" * 80)
+        print("TOP 5 PLAYERS - BEST SKILLS")
+        print("-" * 80)
+        
+        for i, (player, data) in enumerate(sorted_players[:5], 1):
+            print(f"\n{i}. {player} - Top 8 Avg: {data['top8_rating']:.2f}")
+            print(f"   Best 8 Skills:")
+            for j, skill_info in enumerate(data['top8_skills'], 1):
+                skill_name = skill_info['skill'].replace('Technical >> ', '').replace('Tactical/Psychological/Physical >> ', '')
+                print(f"      {j}. {skill_name}: {skill_info['rating']:.2f}")
+    
+    def analyze_voter_player_bias(self):
+        """Deep analysis of voter bias towards specific players"""
+        print("\n" + "=" * 80)
+        print("DEEP VOTER-PLAYER BIAS ANALYSIS")
+        print("=" * 80)
+        
+        # For each voter, analyze if they have systematic bias towards specific players
+        voter_player_bias = {}
+        
+        for voter in self.voters:
+            voter_num = int(voter.split()[-1])
+            voter_bias = {
+                'voter_number': voter_num,
+                'player_deviations': {},
+                'most_favorable': [],
+                'most_critical': []
+            }
+            
+            # Calculate deviation from mean for each player
+            all_deviations = []
+            for player in self.players:
+                player_data = self.df[self.df['Name'] == player]
+                voter_scores = []
+                all_voter_scores = []
+                
+                for skill in player_data['Skill'].unique():
+                    skill_row = player_data[player_data['Skill'] == skill]
+                    if not skill_row.empty:
+                        # This voter's score
+                        try:
+                            voter_score = skill_row[voter].values[0]
+                            if pd.notna(voter_score) and str(voter_score).strip():
+                                voter_scores.append(float(voter_score))
+                        except:
+                            pass
+                        
+                        # All voters' scores for comparison
+                        for v in self.voters:
+                            try:
+                                v_score = skill_row[v].values[0]
+                                if pd.notna(v_score) and str(v_score).strip():
+                                    all_voter_scores.append(float(v_score))
+                            except:
+                                pass
+                
+                if voter_scores and all_voter_scores:
+                    voter_mean = np.mean(voter_scores)
+                    overall_mean = np.mean(all_voter_scores)
+                    deviation = voter_mean - overall_mean
+                    
+                    voter_bias['player_deviations'][player] = {
+                        'voter_mean': voter_mean,
+                        'overall_mean': overall_mean,
+                        'deviation': deviation,
+                        'num_ratings': len(voter_scores)
+                    }
+                    all_deviations.append((player, deviation))
+            
+            # Sort to find most favorable and most critical
+            all_deviations.sort(key=lambda x: x[1], reverse=True)
+            voter_bias['most_favorable'] = all_deviations[:3]  # Top 3 positive deviations
+            voter_bias['most_critical'] = all_deviations[-3:]  # Top 3 negative deviations
+            
+            voter_player_bias[voter] = voter_bias
+        
+        self.voter_player_bias = voter_player_bias
+        
+        # Display analysis
+        self._display_voter_player_bias()
+        
+        return voter_player_bias
+    
+    def _display_voter_player_bias(self):
+        """Display voter-player bias analysis"""
+        print("\n" + "-" * 80)
+        print("VOTER BIAS TOWARDS SPECIFIC PLAYERS")
+        print("-" * 80)
+        
+        # Only show voters with significant bias
+        for voter, bias_data in self.voter_player_bias.items():
+            voter_num = bias_data['voter_number']
+            
+            # Check if there's significant bias (deviation > 1.0)
+            has_significant_bias = False
+            for player, dev in bias_data['most_favorable']:
+                if abs(dev) > 1.0:
+                    has_significant_bias = True
+                    break
+            for player, dev in bias_data['most_critical']:
+                if abs(dev) > 1.0:
+                    has_significant_bias = True
+                    break
+            
+            if has_significant_bias:
+                print(f"\nVoter {voter_num}:")
+                
+                # Show most favorable
+                print("  Most Favorable Players:")
+                for player, deviation in bias_data['most_favorable']:
+                    if deviation > 0.5:  # Only show significant positive bias
+                        details = bias_data['player_deviations'][player]
+                        print(f"    • {player}: {deviation:+.2f} (voter avg: {details['voter_mean']:.2f} vs overall: {details['overall_mean']:.2f})")
+                
+                # Show most critical
+                print("  Most Critical Towards:")
+                for player, deviation in bias_data['most_critical']:
+                    if deviation < -0.5:  # Only show significant negative bias
+                        details = bias_data['player_deviations'][player]
+                        print(f"    • {player}: {deviation:+.2f} (voter avg: {details['voter_mean']:.2f} vs overall: {details['overall_mean']:.2f})")
 
 
 def main():
@@ -954,6 +1283,15 @@ def main():
     
     # Calculate filtered ratings (excluding harsh and low reliability voters)
     analyzer.calculate_filtered_ratings()
+    
+    # Calculate 100% reliable voter ratings
+    analyzer.calculate_100_percent_reliable_ratings()
+    
+    # Calculate top 8 features rating
+    analyzer.calculate_top8_features_rating()
+    
+    # Analyze voter-player bias
+    analyzer.analyze_voter_player_bias()
     
     # Create visualizations
     try:

@@ -281,12 +281,12 @@ class SoccerAnalysis:
                 if self.df is not None:
                     for v in self.voters:
                         for _, row in self.df.iterrows():
-                        try:
-                            score = row[v]
-                            if pd.notna(score) and str(score).strip():
-                                all_voters_scores.append(float(score))
-                        except:
-                            continue
+                            try:
+                                score = row[v]
+                                if pd.notna(score) and str(score).strip():
+                                    all_voters_scores.append(float(score))
+                            except:
+                                continue
                 
                     overall_mean = np.mean(all_voters_scores)
                     deviation = analysis['statistics']['mean'] - overall_mean

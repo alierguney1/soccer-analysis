@@ -1,0 +1,229 @@
+﻿Name;Skill;Voter 1;Voter 2;Voter 3;Voter 4;Voter 5;Voter 6;Voter 7;Voter 8;Voter 9;Voter 10;Voter 11;Voter 12;Voter 13;Voter 14;Voter 15
+Ali Rıza Başer;Technical >> Controlling;7;4;6;7;7;7;8;6;6;7;8;8;8;7;8
+Ali Rıza Başer;Technical >> Dribbling;7;3;6;6;5;6;5;6;4;2;7;5;7;7;6
+Ali Rıza Başer;Technical >> Passing;7;4;6;7;6;6;7;5;7;7;8;6;8;7;7
+Ali Rıza Başer;Technical >> Shooting;8;5;8;9;9;7;9;9;9;8;8;9;10;9;8
+Ali Rıza Başer;Technical >> Finishing;8;5;8;9;9;8;9;7;9;9;8;10;10;9;9
+Ali Rıza Başer;Technical >> Offensive Play;7;5;8;7;8;8;8;8;9;8;8;10;9;9;8
+Ali Rıza Başer;Technical >> Defensive Play;4;3;5;2;3;3;3;1;1;1;2;1;1;5;4
+Ali Rıza Başer;Tactical/Psychological/Physical >> Disciplined;9;3;8;8;7;9;9;7;8;6;8;9;8;6;7
+Ali Rıza Başer;Tactical/Psychological/Physical >> Decision making;7;4;7;8;7;7;9;7;8;7;8;10;8;6;9
+Ali Rıza Başer;Tactical/Psychological/Physical >> Teamwork;6;3;7;7;6;7;8;6;7;4;8;7;7;7;8
+Ali Rıza Başer;Tactical/Psychological/Physical >> Condition;6;3;5;5;5;6;3;5;4;3;6;5;2;6;4
+Ali Rıza Başer;Overall  Player Rating;7;7;8;8;7;7;9;7;7;7;;8;8;7;8
+Yunus Mutlu;Technical >> Controlling;8;4;8;8;8;9;9;8;8;8;9;9;9;9;10
+Yunus Mutlu;Technical >> Dribbling;8;6;8;9;8;10;8;8;6;6;8;8;7;9;9
+Yunus Mutlu;Technical >> Passing;9;4;8;9;8;9;9;9;8;8;9;10;8;10;9
+Yunus Mutlu;Technical >> Shooting;10;3;6;8;7;7;7;7;7;5;7;9;7;6;8
+Yunus Mutlu;Technical >> Finishing;9;4;6;7;7;7;7;7;7;5;8;8;7;7;8
+Yunus Mutlu;Technical >> Offensive Play;9;5;7;9;7;8;8;8;7;7;8;9;7;9;8
+Yunus Mutlu;Technical >> Defensive Play;5;2;6;6;6;6;7;5;4;3;7;7;5;8;7
+Yunus Mutlu;Tactical/Psychological/Physical >> Disciplined;7;4;8;8;6;7;9;7;8;7;8;10;7;7;7
+Yunus Mutlu;Tactical/Psychological/Physical >> Decision making;8;3;8;10;8;8;9;9;8;6;9;10;8;9;10
+Yunus Mutlu;Tactical/Psychological/Physical >> Teamwork;7;4;8;10;7;9;9;9;8;9;9;10;8;9;9
+Yunus Mutlu;Tactical/Psychological/Physical >> Condition;6;5;6;5;5;5;7;6;7;4;7;5;5;5;6
+Yunus Mutlu;Overall  Player Rating;8;8;9;9;7;9;10;8;8;8;;9;7;9;9
+Gürkan Özkan;Technical >> Controlling;6;3;5;7;5;6;8;3;5;3;6;6;6;7;6
+Gürkan Özkan;Technical >> Dribbling;5;2;4;5;4;3;4;3;2;2;5;3;4;3;5
+Gürkan Özkan;Technical >> Passing;6;4;6;9;5;8;9;4;5;6;7;4;5;6;7
+Gürkan Özkan;Technical >> Shooting;6;3;4;6;4;5;6;6;2;4;6;4;5;6;6
+Gürkan Özkan;Technical >> Finishing;6;3;4;7;5;5;5;4;2;4;6;4;5;6;5
+Gürkan Özkan;Technical >> Offensive Play;6;3;4;6;5;4;6;4;2;3;5;;4;4;4
+Gürkan Özkan;Technical >> Defensive Play;8;5;8;10;8;7;8;8;7;7;8;9;6;9;6
+Gürkan Özkan;Tactical/Psychological/Physical >> Disciplined;8;3;8;8;7;8;9;8;6;7;8;10;8;8;7
+Gürkan Özkan;Tactical/Psychological/Physical >> Decision making;6;5;7;8;6;7;10;5;6;5;6;7;6;7;6
+Gürkan Özkan;Tactical/Psychological/Physical >> Teamwork;8;4;8;9;8;8;9;8;6;7;8;9;8;8;8
+Gürkan Özkan;Tactical/Psychological/Physical >> Condition;6;3;3;3;8;4;5;7;4;5;5;6;6;6;5
+Gürkan Özkan;Overall  Player Rating;7;6;6;7;5;5;8;5;5;5;;5;6;6;7
+Burak Tanrıöver;Technical >> Controlling;5;1;5;7;5;5;6;6;5;7;6;8;6;6;7
+Burak Tanrıöver;Technical >> Dribbling;7;3;5;9;6;7;7;6;8;6;6;6;7;6;7
+Burak Tanrıöver;Technical >> Passing;5;2;5;7;5;5;6;5;6;4;6;6;6;5;6
+Burak Tanrıöver;Technical >> Shooting;6;2;4;7;5;6;7;5;6;5;5;5;6;5;6
+Burak Tanrıöver;Technical >> Finishing;6;3;4;6;5;5;6;4;7;6;5;4;5;5;7
+Burak Tanrıöver;Technical >> Offensive Play;7;4;6;8;6;6;7;6;7;7;6;6;7;5;8
+Burak Tanrıöver;Technical >> Defensive Play;4;2;4;5;6;5;5;4;3;3;5;6;5;6;5
+Burak Tanrıöver;Tactical/Psychological/Physical >> Disciplined;7;3;7;8;7;8;9;8;7;5;7;9;7;8;8
+Burak Tanrıöver;Tactical/Psychological/Physical >> Decision making;6;3;5;8;6;5;7;5;6;6;6;7;6;5;6
+Burak Tanrıöver;Tactical/Psychological/Physical >> Teamwork;7;3;5;10;7;7;8;8;7;6;7;9;7;7;6
+Burak Tanrıöver;Tactical/Psychological/Physical >> Condition;7;4;8;8;8;7;7;7;7;5;6;9;6;7;6
+Burak Tanrıöver;Overall  Player Rating;6;5;6;7;5;5;8;5;6;6;;6;6;5;6
+Sait Tunahan Gür;Technical >> Controlling;8;4;7;7;6;7;8;5;7;6;7;9;8;7;8
+Sait Tunahan Gür;Technical >> Dribbling;7;4;6;7;6;7;7;5;8;5;8;7;8;7;8
+Sait Tunahan Gür;Technical >> Passing;7;5;6;8;6;6;7;6;8;3;6;7;5;6;8
+Sait Tunahan Gür;Technical >> Shooting;8;4;7;7;7;7;8;9;9;6;7;9;9;8;8
+Sait Tunahan Gür;Technical >> Finishing;6;4;6;9;6;7;8;8;8;7;5;6;7;8;8
+Sait Tunahan Gür;Technical >> Offensive Play;8;5;7;8;7;7;7;7;8;6;6;8;8;7;9
+Sait Tunahan Gür;Technical >> Defensive Play;6;3;5;5;7;5;7;1;1;3;6;5;4;7;6
+Sait Tunahan Gür;Tactical/Psychological/Physical >> Disciplined;7;4;7;7;7;6;8;7;7;4;5;8;5;6;8
+Sait Tunahan Gür;Tactical/Psychological/Physical >> Decision making;7;5;7;6;7;7;7;6;7;4;6;9;4;7;7
+Sait Tunahan Gür;Tactical/Psychological/Physical >> Teamwork;6;5;7;5;7;6;6;6;6;4;7;8;4;5;8
+Sait Tunahan Gür;Tactical/Psychological/Physical >> Condition;6;4;7;7;6;5;8;5;8;6;8;6;5;7;8
+Sait Tunahan Gür;Overall  Player Rating;7;8;7;7;6;7;8;7;7;6;;7;7;7;8
+Ali Ramazan Eken;Technical >> Controlling;8;5;7;9;9;7;9;7;9;7;8;10;8;9;9
+Ali Ramazan Eken;Technical >> Dribbling;9;4;7;9;9;6;9;9;9;7;9;10;10;9;10
+Ali Ramazan Eken;Technical >> Passing;8;4;7;8;8;7;9;8;9;7;8;10;7;9;8
+Ali Ramazan Eken;Technical >> Shooting;8;4;6;9;8;7;9;7;9;7;8;10;8;8;8
+Ali Ramazan Eken;Technical >> Finishing;8;4;6;8;8;6;9;8;8;5;9;10;8;9;9
+Ali Ramazan Eken;Technical >> Offensive Play;9;5;7;9;8;7;9;10;9;6;8;10;9;9;9
+Ali Ramazan Eken;Technical >> Defensive Play;8;4;6;8;8;9;9;7;5;8;9;8;6;10;8
+Ali Ramazan Eken;Tactical/Psychological/Physical >> Disciplined;9;5;8;10;8;9;10;10;9;9;9;10;8;9;10
+Ali Ramazan Eken;Tactical/Psychological/Physical >> Decision making;8;4;8;8;8;7;9;8;8;8;8;10;7;10;8
+Ali Ramazan Eken;Tactical/Psychological/Physical >> Teamwork;10;5;8;8;9;9;10;9;9;9;9;10;8;9;9
+Ali Ramazan Eken;Tactical/Psychological/Physical >> Condition;9;6;9;10;9;10;9;10;10;8;10;9;9;10;10
+Ali Ramazan Eken;Overall  Player Rating;8;9;9;9;9;9;10;9;9;9;;10;9;9;10
+Mustafa Esat Özyörük;Technical >> Controlling;7;3;5;7;6;6;8;6;8;5;8;7;6;8;6
+Mustafa Esat Özyörük;Technical >> Dribbling;6;4;5;8;6;5;8;5;9;5;8;7;8;7;5
+Mustafa Esat Özyörük;Technical >> Passing;6;5;5;7;6;5;8;5;6;5;6;8;6;7;6
+Mustafa Esat Özyörük;Technical >> Shooting;6;2;5;7;6;5;8;6;6;4;6;6;6;7;5
+Mustafa Esat Özyörük;Technical >> Finishing;7;4;5;8;8;5;8;7;8;4;7;6;6;7;8
+Mustafa Esat Özyörük;Technical >> Offensive Play;7;4;5;7;6;6;8;6;8;4;7;5;6;7;6
+Mustafa Esat Özyörük;Technical >> Defensive Play;9;5;7;9;7;9;10;10;8;7;8;9;8;10;9
+Mustafa Esat Özyörük;Tactical/Psychological/Physical >> Disciplined;9;6;7;10;7;8;10;10;9;6;9;9;9;9;9
+Mustafa Esat Özyörük;Tactical/Psychological/Physical >> Decision making;6;3;5;9;6;6;8;6;8;5;7;9;6;8;6
+Mustafa Esat Özyörük;Tactical/Psychological/Physical >> Teamwork;8;6;7;10;7;9;8;8;9;8;9;9;8;9;9
+Mustafa Esat Özyörük;Tactical/Psychological/Physical >> Condition;9;7;9;10;8;10;9;10;10;7;9;6;10;10;10
+Mustafa Esat Özyörük;Overall  Player Rating;7;7;7;8;6;6;9;9;8;6;;7;8;9;8
+Emre Akın;Technical >> Controlling;8;2;7;8;4;6;9;8;7;4;7;9;10;7;8
+Emre Akın;Technical >> Dribbling;7;3;5;7;4;5;7;4;4;2;6;8;6;5;6
+Emre Akın;Technical >> Passing;7;2;5;8;4;5;7;5;5;7;4;7;6;6;5
+Emre Akın;Technical >> Shooting;8;4;8;9;5;7;7;8;6;7;6;8;7;8;8
+Emre Akın;Technical >> Finishing;7;4;6;7;6;7;7;6;6;6;6;7;8;6;8
+Emre Akın;Technical >> Offensive Play;7;3;7;7;5;7;7;6;7;7;7;8;7;7;7
+Emre Akın;Technical >> Defensive Play;5;2;4;2;3;4;7;1;1;2;3;4;1;4;4
+Emre Akın;Tactical/Psychological/Physical >> Disciplined;5;2;6;4;3;3;6;6;6;3;4;8;4;6;7
+Emre Akın;Tactical/Psychological/Physical >> Decision making;7;2;6;6;4;5;8;5;4;6;6;9;6;7;6
+Emre Akın;Tactical/Psychological/Physical >> Teamwork;6;2;6;6;4;4;8;5;2;8;5;7;5;6;6
+Emre Akın;Tactical/Psychological/Physical >> Condition;6;2;4;3;3;4;7;4;4;4;6;5;2;5;5
+Emre Akın;Overall  Player Rating;6;5;7;6;4;5;8;5;6;6;;7;6;6;6
+Mustafa İkbal Koçer;Technical >> Controlling;8;5;7;8;8;6;9;7;8;7;8;8;9;9;10
+Mustafa İkbal Koçer;Technical >> Dribbling;8;5;7;8;7;8;7;8;7;6;7;4;7;9;10
+Mustafa İkbal Koçer;Technical >> Passing;8;5;7;9;9;7;9;9;8;7;8;6;7;9;9
+Mustafa İkbal Koçer;Technical >> Shooting;7;5;5;8;7;7;7;8;7;6;7;7;8;7;8
+Mustafa İkbal Koçer;Technical >> Finishing;7;4;5;8;8;6;7;6;7;3;6;8;6;7;9
+Mustafa İkbal Koçer;Technical >> Offensive Play;7;5;5;8;7;5;7;7;8;7;6;6;7;8;8
+Mustafa İkbal Koçer;Technical >> Defensive Play;7;4;5;7;8;5;8;6;7;4;7;9;7;9;8
+Mustafa İkbal Koçer;Tactical/Psychological/Physical >> Disciplined;9;4;7;8;8;7;9;8;8;7;9;10;7;9;9
+Mustafa İkbal Koçer;Tactical/Psychological/Physical >> Decision making;7;5;7;8;8;7;8;8;9;9;8;10;8;10;10
+Mustafa İkbal Koçer;Tactical/Psychological/Physical >> Teamwork;9;4;7;9;8;7;9;10;9;8;9;10;10;8;9
+Mustafa İkbal Koçer;Tactical/Psychological/Physical >> Condition;7;4;4;5;7;5;8;7;6;3;7;7;5;7;8
+Mustafa İkbal Koçer;Overall  Player Rating;8;8;7;8;8;7;9;8;8;7;;7;8;9;9
+Eren Öngen;Technical >> Controlling;4;2;2;5;3;4;6;;4;4;4;5;6;4;4
+Eren Öngen;Technical >> Dribbling;2;2;2;4;2;3;5;;3;3;4;5;5;4;4
+Eren Öngen;Technical >> Passing;2;2;2;6;2;5;7;;6;5;3;5;6;5;5
+Eren Öngen;Technical >> Shooting;5;2;2;5;2;2;5;;3;2;3;4;5;4;4
+Eren Öngen;Technical >> Finishing;4;2;2;3;2;2;5;;4;2;3;2;5;4;4
+Eren Öngen;Technical >> Offensive Play;3;2;2;;3;3;5;;3;3;3;3;4;4;3
+Eren Öngen;Technical >> Defensive Play;5;2;6;8;4;5;9;;9;8;7;6;6;7;6
+Eren Öngen;Tactical/Psychological/Physical >> Disciplined;8;2;8;9;7;7;9;;9;7;8;10;9;7;10
+Eren Öngen;Tactical/Psychological/Physical >> Decision making;4;2;3;5;4;3;8;;5;4;6;5;5;5;4
+Eren Öngen;Tactical/Psychological/Physical >> Teamwork;8;3;4;7;7;6;8;;9;8;7;7;6;6;6
+Eren Öngen;Tactical/Psychological/Physical >> Condition;4;3;3;6;7;5;8;;6;5;7;6;7;7;8
+Eren Öngen;Overall  Player Rating;5;4;4;6;3;3;7;;5;5;;4;6;5;5
+Bahadır Demiray;Technical >> Controlling;6;5;5;7;6;5;7;7;8;6;7;8;7;7;7
+Bahadır Demiray;Technical >> Dribbling;7;4;6;8;6;7;7;7;8;5;7;7;6;7;7
+Bahadır Demiray;Technical >> Passing;6;4;5;7;6;5;8;6;7;6;7;6;8;7;7
+Bahadır Demiray;Technical >> Shooting;7;4;5;7;6;5;8;6;7;5;7;6;6;7;7
+Bahadır Demiray;Technical >> Finishing;6;4;5;6;6;5;7;6;7;2;7;6;6;6;6
+Bahadır Demiray;Technical >> Offensive Play;6;4;7;7;6;6;8;8;7;6;7;8;7;7;7
+Bahadır Demiray;Technical >> Defensive Play;7;4;5;8;6;6;9;6;4;4;7;7;8;8;7
+Bahadır Demiray;Tactical/Psychological/Physical >> Disciplined;9;5;7;10;8;8;10;8;8;7;9;9;9;9;8
+Bahadır Demiray;Tactical/Psychological/Physical >> Decision making;7;4;6;7;6;4;8;6;8;4;7;9;5;8;6
+Bahadır Demiray;Tactical/Psychological/Physical >> Teamwork;8;5;7;9;8;8;8;8;8;8;8;9;9;9;9
+Bahadır Demiray;Tactical/Psychological/Physical >> Condition;10;6;9;10;8;9;10;9;10;6;9;10;9;9;10
+Bahadır Demiray;Overall  Player Rating;7;7;7;8;6;6;9;7;7;6;;7;8;8;7
+Yunus Emre Gürbüzer;Technical >> Controlling;9;5;7;8;9;7;9;7;8;4;9;10;7;8;10
+Yunus Emre Gürbüzer;Technical >> Dribbling;8;5;8;9;8;9;9;8;8;4;8;9;7;8;9
+Yunus Emre Gürbüzer;Technical >> Passing;9;5;7;8;8;7;9;7;8;3;8;8;7;9;9
+Yunus Emre Gürbüzer;Technical >> Shooting;7;3;6;8;8;7;9;6;8;6;9;10;7;7;9
+Yunus Emre Gürbüzer;Technical >> Finishing;8;4;5;8;8;7;9;6;7;6;7;9;7;8;9
+Yunus Emre Gürbüzer;Technical >> Offensive Play;8;4;7;8;8;8;9;8;7;6;8;9;8;8;9
+Yunus Emre Gürbüzer;Technical >> Defensive Play;8;4;6;7;8;6;9;7;3;2;8;6;6;10;8
+Yunus Emre Gürbüzer;Tactical/Psychological/Physical >> Disciplined;9;5;8;7;8;7;10;9;6;4;9;10;7;9;8
+Yunus Emre Gürbüzer;Tactical/Psychological/Physical >> Decision making;9;5;8;8;8;7;9;8;7;4;8;10;7;8;9
+Yunus Emre Gürbüzer;Tactical/Psychological/Physical >> Teamwork;9;5;8;4;7;5;9;5;5;4;9;9;7;9;9
+Yunus Emre Gürbüzer;Tactical/Psychological/Physical >> Condition;8;6;5;7;7;6;9;8;7;4;9;9;6;8;9
+Yunus Emre Gürbüzer;Overall  Player Rating;8;9;8;8;8;8;10;7;8;6;;9;8;9;9
+Mert Koç;Technical >> Controlling;5;2;2;3;4;4;7;5;3;4;3;5;5;5;5
+Mert Koç;Technical >> Dribbling;5;2;2;5;4;4;8;5;3;4;4;5;8;5;6
+Mert Koç;Technical >> Passing;5;2;2;5;4;3;7;5;3;4;3;5;6;5;4
+Mert Koç;Technical >> Shooting;5;2;2;6;4;6;8;5;3;2;3;5;6;5;5
+Mert Koç;Technical >> Finishing;5;2;2;7;4;5;7;5;3;2;3;5;5;5;4
+Mert Koç;Technical >> Offensive Play;5;2;2;5;4;5;7;5;3;3;3;5;5;4;5
+Mert Koç;Technical >> Defensive Play;5;4;6;8;7;7;8;8;8;6;7;5;7;7;7
+Mert Koç;Tactical/Psychological/Physical >> Disciplined;8;5;6;8;8;8;8;9;7;6;8;5;8;7;8
+Mert Koç;Tactical/Psychological/Physical >> Decision making;5;3;3;4;5;4;8;4;6;6;5;5;7;5;5
+Mert Koç;Tactical/Psychological/Physical >> Teamwork;6;5;5;8;8;7;8;7;7;7;7;5;6;7;8
+Mert Koç;Tactical/Psychological/Physical >> Condition;8;6;7;10;8;8;9;7;7;6;8;5;9;9;9
+Mert Koç;Overall  Player Rating;5;5;5;6;5;5;8;5;4;5;;4;7;5;6
+Arcan Hakgör;Technical >> Controlling;7;4;7;8;6;7;9;7;7;6;7;8;8;8;9
+Arcan Hakgör;Technical >> Dribbling;7;4;6;6;6;7;9;8;7;6;8;8;7;8;7
+Arcan Hakgör;Technical >> Passing;7;4;6;9;6;6;8;6;7;6;7;9;7;9;8
+Arcan Hakgör;Technical >> Shooting;6;5;6;8;6;6;9;7;7;6;7;9;8;8;8
+Arcan Hakgör;Technical >> Finishing;6;5;4;8;5;5;8;6;7;4;7;7;7;8;7
+Arcan Hakgör;Technical >> Offensive Play;8;5;6;8;6;7;9;7;7;7;7;8;8;9;8
+Arcan Hakgör;Technical >> Defensive Play;7;2;4;3;4;5;8;7;3;3;4;7;6;7;5
+Arcan Hakgör;Tactical/Psychological/Physical >> Disciplined;8;3;7;8;5;7;6;9;7;6;8;9;7;8;7
+Arcan Hakgör;Tactical/Psychological/Physical >> Decision making;7;4;6;8;4;7;8;5;7;6;6;8;8;9;7
+Arcan Hakgör;Tactical/Psychological/Physical >> Teamwork;7;3;7;8;4;8;8;8;7;6;7;9;7;8;8
+Arcan Hakgör;Tactical/Psychological/Physical >> Condition;8;4;6;5;4;7;8;9;9;5;7;9;8;7;7
+Arcan Hakgör;Overall  Player Rating;7;8;7;7;5;6;9;6;6;7;;7;8;8;7
+Ali Osman Ergüney;Technical >> Controlling;7;3;6;8;7;6;9;6;8;7;7;8;6;7;8
+Ali Osman Ergüney;Technical >> Dribbling;8;4;6;8;7;4;9;6;7;8;7;9;7;9;8
+Ali Osman Ergüney;Technical >> Passing;6;4;5;8;6;5;7;8;8;6;7;8;7;7;6
+Ali Osman Ergüney;Technical >> Shooting;7;5;6;9;8;6;9;9;8;8;9;9;10;10;9
+Ali Osman Ergüney;Technical >> Finishing;7;4;4;7;8;5;9;7;8;5;8;9;6;8;9
+Ali Osman Ergüney;Technical >> Offensive Play;7;5;5;8;6;5;9;10;8;7;7;8;7;8;8
+Ali Osman Ergüney;Technical >> Defensive Play;3;2;4;3;4;4;6;5;3;4;4;6;7;6;4
+Ali Osman Ergüney;Tactical/Psychological/Physical >> Disciplined;6;2;6;5;3;4;8;8;8;6;6;9;8;6;5
+Ali Osman Ergüney;Tactical/Psychological/Physical >> Decision making;7;3;5;4;4;6;9;10;8;7;7;8;7;6;6
+Ali Osman Ergüney;Tactical/Psychological/Physical >> Teamwork;5;2;5;3;3;6;7;8;6;8;6;9;8;6;5
+Ali Osman Ergüney;Tactical/Psychological/Physical >> Condition;6;4;4;3;3;5;8;6;8;5;6;8;8;7;5
+Ali Osman Ergüney;Overall  Player Rating;6;8;6;7;5;5;9;7;7;7;;7;8;8;7
+Sedat Kırat;Technical >> Controlling;3;1;2;4;3;2;6;;4;3;3;4;5;4;4
+Sedat Kırat;Technical >> Dribbling;3;1;2;3;2;2;6;;1;2;2;3;4;3;4
+Sedat Kırat;Technical >> Passing;5;1;2;5;3;3;6;;4;5;2;4;5;5;3
+Sedat Kırat;Technical >> Shooting;5;1;2;4;3;1;6;;1;3;2;3;3;4;3
+Sedat Kırat;Technical >> Finishing;4;1;2;3;3;1;6;;1;3;2;2;3;4;3
+Sedat Kırat;Technical >> Offensive Play;4;1;2;2;3;2;5;;1;2;2;2;3;3;2
+Sedat Kırat;Technical >> Defensive Play;7;;4;8;6;5;8;;7;6;6;7;5;6;5
+Sedat Kırat;Tactical/Psychological/Physical >> Disciplined;8;3;7;9;6;7;8;;6;6;7;7;8;6;5
+Sedat Kırat;Tactical/Psychological/Physical >> Decision making;5;1;2;6;4;1;6;;3;4;3;6;5;5;4
+Sedat Kırat;Tactical/Psychological/Physical >> Teamwork;5;3;2;9;6;7;9;;5;5;8;8;8;6;7
+Sedat Kırat;Tactical/Psychological/Physical >> Condition;6;2;2;5;4;4;7;;5;4;3;4;4;5;6
+Sedat Kırat;Overall  Player Rating;5;4;2;5;3;2;7;;3;4;;4;6;5;4
+Berk Arık;Technical >> Controlling;6;4;5;7;5;6;9;5;5;;6;8;6;6;6
+Berk Arık;Technical >> Dribbling;6;3;4;5;6;5;8;5;1;;7;5;6;6;5
+Berk Arık;Technical >> Passing;6;3;3;7;6;5;8;5;5;;6;7;7;6;6
+Berk Arık;Technical >> Shooting;6;3;2;6;6;5;8;5;1;;5;6;5;6;6
+Berk Arık;Technical >> Finishing;6;3;3;6;6;5;8;5;1;;5;5;5;6;5
+Berk Arık;Technical >> Offensive Play;6;3;5;7;6;5;8;5;1;;6;4;5;6;7
+Berk Arık;Technical >> Defensive Play;6;4;3;7;6;7;7;5;7;;7;7;9;6;6
+Berk Arık;Tactical/Psychological/Physical >> Disciplined;8;3;6;7;7;7;8;7;6;;8;10;9;7;8
+Berk Arık;Tactical/Psychological/Physical >> Decision making;6;3;3;7;7;6;8;4;5;;6;8;8;8;6
+Berk Arık;Tactical/Psychological/Physical >> Teamwork;6;3;5;7;7;6;8;7;6;;8;8;9;8;7
+Berk Arık;Tactical/Psychological/Physical >> Condition;7;3;6;7;6;5;8;7;6;;8;6;7;7;9
+Berk Arık;Overall  Player Rating;6;5;4;7;6;5;9;5;4;;;6;8;6;6
+Feyyaz Kekeç;Technical >> Controlling;8;4;7;8;8;5;8;7;8;6;7;8;6;8;9
+Feyyaz Kekeç;Technical >> Dribbling;8;4;6;8;8;5;9;7;8;6;8;9;8;8;9
+Feyyaz Kekeç;Technical >> Passing;8;4;5;7;6;5;8;7;7;6;7;9;7;9;7
+Feyyaz Kekeç;Technical >> Shooting;7;4;7;8;7;6;8;7;7;6;8;10;9;8;9
+Feyyaz Kekeç;Technical >> Finishing;7;4;5;8;7;6;8;6;7;4;6;9;6;8;8
+Feyyaz Kekeç;Technical >> Offensive Play;7;4;6;8;7;6;8;7;8;7;7;8;7;8;9
+Feyyaz Kekeç;Technical >> Defensive Play;8;2;7;6;7;6;9;7;3;3;7;10;8;8;6
+Feyyaz Kekeç;Tactical/Psychological/Physical >> Disciplined;8;3;8;8;4;7;9;9;8;7;8;9;8;8;8
+Feyyaz Kekeç;Tactical/Psychological/Physical >> Decision making;7;2;6;7;4;7;8;6;7;7;7;8;6;8;7
+Feyyaz Kekeç;Tactical/Psychological/Physical >> Teamwork;7;2;7;8;5;6;8;8;8;7;8;9;7;8;8
+Feyyaz Kekeç;Tactical/Psychological/Physical >> Condition;8;4;7;8;8;6;9;9;9;5;8;3;8;7;8
+Feyyaz Kekeç;Overall  Player Rating;8;8;8;7;7;5;9;7;7;6;;8;8;8;8
+Ali Berk Balta;Technical >> Controlling;3;2;2;3;3;3;5;5;5;4;3;5;5;5;4
+Ali Berk Balta;Technical >> Dribbling;3;2;2;3;3;2;5;5;4;3;3;2;4;5;5
+Ali Berk Balta;Technical >> Passing;3;2;3;5;4;3;5;5;6;6;4;3;5;5;5
+Ali Berk Balta;Technical >> Shooting;3;2;2;5;4;3;5;6;3;4;3;2;4;5;4
+Ali Berk Balta;Technical >> Finishing;3;2;2;4;4;2;5;5;3;3;4;2;4;5;4
+Ali Berk Balta;Technical >> Offensive Play;3;2;2;3;3;3;5;4;3;3;5;1;4;5;5
+Ali Berk Balta;Technical >> Defensive Play;7;3;4;8;7;3;7;10;9;6;7;5;6;7;6
+Ali Berk Balta;Tactical/Psychological/Physical >> Disciplined;5;2;5;5;6;7;7;10;8;5;8;9;9;6;7
+Ali Berk Balta;Tactical/Psychological/Physical >> Decision making;4;2;2;5;5;4;7;4;5;6;4;6;5;7;5
+Ali Berk Balta;Tactical/Psychological/Physical >> Teamwork;5;2;2;9;7;6;8;9;8;7;7;7;8;7;6
+Ali Berk Balta;Tactical/Psychological/Physical >> Condition;5;3;3;5;7;5;8;6;5;4;5;5;5;6;8
+Ali Berk Balta;Overall  Player Rating;5;4;3;5;4;3;6;5;5;5;;4;6;6;6

@@ -72,6 +72,7 @@ Analiz tamamlandığında `analysis_output/` klasöründe şu dosyalar oluşturu
 6. **06_voter_distributions.png** - Oylayıcı skor dağılımları
 7. **07_skill_comparison.png** - En iyi 8 oyuncu için yetenek karşılaştırması
 8. **Soccer_Analysis_Report.pdf** - Tüm grafikleri içeren PDF rapor
+9. **SUMMARY_REPORT.txt** - Türkçe özet rapor (kolayca paylaşılabilir)
 
 ## Veri Formatı
 

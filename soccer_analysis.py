@@ -624,6 +624,15 @@ def main():
         print(f"\n⚠️  Could not import visualizer: {e}")
     except Exception as e:
         print(f"\n⚠️  Error creating visualizations: {e}")
+    
+    # Generate text summary report
+    try:
+        from report_generator import generate_text_report
+        generate_text_report(analyzer)
+    except ImportError as e:
+        print(f"\n⚠️  Could not import report generator: {e}")
+    except Exception as e:
+        print(f"\n⚠️  Error generating text report: {e}")
 
 
 if __name__ == '__main__':
